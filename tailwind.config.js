@@ -12,26 +12,30 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#0891b2', // cyan-600
-          light: '#22d3ee',   // cyan-400
-          dark: '#0e7490',    // cyan-700
+          DEFAULT: '#FFD700', // Amarelo metálico principal
+          light: '#FFF200',   // Tom claro para gradientes e destaques
+          dark: '#B8860B',    // Amarelo ouro escuro para contrastes e hovers
         },
         secondary: {
-          DEFAULT: '#f97316', // orange-500
-          light: '#fb923c',   // orange-400
-          dark: '#ea580c',    // orange-600
+          DEFAULT: '#000000', // Preto sólido
+          light: '#1C1C1C',   // Preto suave / fundo de contraste
+          dark: '#0A0A0A',    // Preto absoluto / background profundo
         },
         neutral: {
-          100: '#f8fafc', // slate-50
-          200: '#f1f5f9', // slate-100
-          300: '#e2e8f0', // slate-200
-          400: '#cbd5e1', // slate-300
-          500: '#94a3b8', // slate-400
-          600: '#64748b', // slate-500
-          700: '#475569', // slate-600
-          800: '#334155', // slate-700
-          900: '#1e293b', // slate-800
-        }
+          100: '#F8FAFC', // Fundo geral claro
+          200: '#F1F5F9', // Fundo de seções alternadas
+          300: '#E2E8F0', // Bordas suaves
+          400: '#CBD5E1', // Bordas
+          500: '#94A3B8', // Texto desabilitado
+          600: '#64748B', // Texto secundário
+          700: '#475569', // Texto
+          800: '#262626', // Fundo do footer / elementos escuros
+          900: '#0D0D0D', // Fundo muito escuro / modo dark
+        },
+        accent: {
+          gold: '#FFD700', // Acentos e highlights em dourado
+          metallic: '#BFA100', // Detalhes metálicos
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
