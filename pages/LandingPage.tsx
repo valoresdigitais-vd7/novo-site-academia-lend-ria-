@@ -1,397 +1,378 @@
-import React, { useState, useRef } from 'react';
-import type { Product, Testimonial } from '../types';
-import { PRODUCTS, TESTIMONIALS, FAQ_DATA } from '../constants';
-import { CheckCircleIcon, ZapIcon, ShieldIcon, ChevronDownIcon, UsersIcon, TargetIcon, HeartIcon } from '../components/icons';
+import React, { useState } from 'react';
+import { 
+  CheckCircle, 
+  Zap, 
+  Shield, 
+  ChevronDown, 
+  Users, 
+  Target, 
+  Heart, 
+  Play, 
+  Star, 
+  Brain, 
+  Lock 
+} from 'lucide-react';
 
-// --- SHARED COMPONENTS ---
+// --- CORES & TEMA (Hardcoded para garantir o visual Gold/Black) ---
+const THEME = {
+  bg: 'bg-black',
+  bgSecondary: 'bg-[#0A0A0A]',
+  bgTertiary: 'bg-[#111111]',
+  textPrimary: 'text-[#FFD65D]', // Dourado Principal
+  textSecondary: 'text-[#E7C66C]', // Dourado Secundário
+  textMuted: 'text-neutral-400',
+  textWhite: 'text-white',
+  border: 'border-[#FFD65D]',
+  borderMuted: 'border-[#333]',
+  button: 'bg-[#FFD65D] hover:bg-[#E7C66C] text-black',
+};
+
+// --- DADOS MOCKADOS (Baseados no seu texto "Lendária") ---
+const TESTIMONIALS = [
+  {
+    quote: "A comunidade mudou meu jogo. Implementei automações que me economizam 20h por semana.",
+    author: "Ricardo M.",
+    role: "Empresário",
+    avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026024d"
+  },
+  {
+    quote: "O conteúdo sobre 'Segundo Cérebro' vale mais que muito MBA por aí. ROI infinito.",
+    author: "Ana Souza",
+    role: "Consultora de Marketing",
+    avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d"
+  },
+  {
+    quote: "Já faturei 5x o valor do curso apenas aplicando o módulo de prospecção com IA.",
+    author: "Felipe Costa",
+    role: "Freelancer",
+    avatarUrl: "https://i.pravatar.cc/150?u=a04258114e29026302d"
+  }
+];
+
+const FAQ_DATA = [
+  {
+    question: "O acesso é realmente vitalício?",
+    answer: "Sim! Ao garantir sua vaga hoje, você recebe acesso eterno à Comunidade Lendár[IA], a todos os 25 cursos atuais e a todas as atualizações futuras sem pagar nada a mais."
+  },
+  {
+    question: "Serve para quem não sabe nada de programação?",
+    answer: "Com certeza. O foco da Academia é a aplicação prática de IA para negócios e produtividade (No-Code). Ensinamos do zero ao avançado."
+  },
+  {
+    question: "Como funciona a garantia?",
+    answer: "Você tem 7 dias para testar tudo. Se não gostar da comunidade, das aulas ou da metodologia, devolvemos 100% do seu dinheiro. O risco é todo nosso."
+  },
+  {
+    question: "Quais ferramentas vou aprender?",
+    answer: "Abordamos as principais IAs do mercado: ChatGPT, Midjourney, Claude, automações com Zapier/Make e muito mais."
+  }
+];
+
+// --- COMPONENTES ---
 
 // InlineCheckoutForm Component
-interface InlineCheckoutFormProps {
-    productName: string;
-}
-const InlineCheckoutForm: React.FC<InlineCheckoutFormProps> = ({ productName }) => {
+const InlineCheckoutForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-    const [message, setMessage] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus('loading');
-        setMessage('');
-
-        // Simulate API call for lead generation
+        // Simulação de API
         await new Promise(resolve => setTimeout(resolve, 1500));
-
-        if (email && email.includes('@')) {
-            setStatus('success');
-            setMessage(`Obrigado! Em breve entraremos em contato para finalizar sua compra do ${productName}.`);
-        } else {
-            setStatus('error');
-            setMessage('Por favor, insira um email válido.');
-        }
+        setStatus('success');
     };
 
     return (
-        <form onSubmit={handleSubmit} className="mt-6">
-            <div className="flex flex-col sm:flex-row gap-2">
+        <form onSubmit={handleSubmit} className="mt-8 w-full max-w-md mx-auto">
+            <div className="flex flex-col sm:flex-row gap-3">
                 <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Seu melhor email"
+                    placeholder="Seu melhor e-mail"
                     required
-                    className="flex-grow px-4 py-3 rounded-md bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 focus:ring-2 focus:ring-primary focus:outline-none transition-shadow"
-                    disabled={status === 'loading'}
+                    className="flex-grow px-4 py-3 rounded-lg bg-[#1A1A1A] border border-[#333] text-white focus:ring-2 focus:ring-[#FFD65D] focus:outline-none focus:border-transparent transition-all"
+                    disabled={status === 'loading' || status === 'success'}
                 />
                 <button
                     type="submit"
-                    className="bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-6 rounded-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary disabled:bg-opacity-50 disabled:cursor-not-allowed"
-                    disabled={status === 'loading'}
+                    className={`${THEME.button} font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    disabled={status === 'loading' || status === 'success'}
                 >
-                    {status === 'loading' ? 'Enviando...' : 'Comprar Agora'}
+                    {status === 'loading' ? 'Processando...' : status === 'success' ? 'Vaga Garantida!' : 'Entrar na Lista'}
                 </button>
             </div>
-            {message && (
-                <p className={`mt-3 text-sm ${status === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                    {message}
+            {status === 'success' && (
+                <p className="mt-3 text-sm text-green-400 font-medium">
+                    Sucesso! Verifique seu e-mail para os próximos passos.
                 </p>
             )}
         </form>
     );
 };
 
-// --- BLOCK 1: CAPTURA E PROPOSTA DE VALOR ---
-
+// --- BLOCO 1: HERO (ATENÇÃO) ---
 const HeroSection: React.FC = () => (
-    <section id="hero" className="py-20 md:py-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-12 items-center">
-                <div className="text-center max-w-3xl">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
-                        A Solução <span className="text-primary dark:text-primary-light">Definitiva</span> para o Seu Negócio
+    <section className={`relative py-24 md:py-32 ${THEME.bg} overflow-hidden`}>
+        {/* Background Radial Effect */}
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,214,93,0.15),_rgba(0,0,0,0)_70%)]"></div>
+        
+        <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col gap-10 items-center text-center">
+                <div className="max-w-4xl">
+                    <span className="inline-block py-1 px-3 rounded-full bg-[#FFD65D]/10 border border-[#FFD65D]/20 text-[#FFD65D] text-sm font-semibold mb-6 tracking-wide uppercase">
+                        Oferta Exclusiva • Acesso Vitalício
+                    </span>
+                    <h1 className={`text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight ${THEME.textPrimary} drop-shadow-lg`}>
+                        Última Compra de IA <br />
+                        <span className="text-white">da Sua Vida</span>
                     </h1>
-                    <p className="mt-4 text-lg md:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
-                        Aumente sua produtividade, otimize processos e alcance resultados incríveis com nossa plataforma inovadora.
+                    <p className={`mt-6 text-lg md:text-xl ${THEME.textSecondary} max-w-2xl mx-auto leading-relaxed`}>
+                        Pare de comprar cursos soltos. Garanta acesso vitalício à <strong>Comunidade Lendár[IA]</strong> + 25 cursos completos e domine o futuro dos negócios.
                     </p>
-                    <div className="max-w-xl mx-auto">
-                        <InlineCheckoutForm productName="Produto Principal" />
-                    </div>
-                    <p className="mt-3 text-xs text-neutral-500">Teste por 7 dias grátis. Cancele quando quiser.</p>
-                </div>
-                <div className="w-full flex justify-center">
-                    <div className="w-full max-w-3xl aspect-video rounded-lg shadow-2xl overflow-hidden">
-                        <iframe
-                            className="w-full h-full"
-                            src="https://www.youtube.com/embed/LXb3EKWsInQ?autoplay=1&mute=1&loop=1&playlist=LXb3EKWsInQ&controls=0&showinfo=0&rel=0"
-                            title="Vídeo de demonstração do produto"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        ></iframe>
+                    
+                    <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <button className={`${THEME.button} px-8 py-4 rounded-lg text-lg font-bold shadow-[0_0_20px_rgba(255,214,93,0.3)] transition-all hover:shadow-[0_0_30px_rgba(255,214,93,0.5)]`}>
+                            Garantir Acesso Eterno
+                        </button>
+                        <p className="text-sm text-neutral-500 mt-2 sm:mt-0">
+                            A partir de 12x R$138,80
+                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-);
 
-// --- BLOCK 2: PROBLEMATIZAÇÃO E SOLUÇÃO ---
-
-const ProblemSolutionSection: React.FC = () => (
-    <section id="problem-solution" className="py-20 bg-neutral-100 dark:bg-neutral-900">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div className="bg-white dark:bg-neutral-800/50 p-8 rounded-lg border border-neutral-200 dark:border-neutral-700">
-                    <h2 className="text-3xl font-bold tracking-tight text-red-600 dark:text-red-400">O Problema: Caos e Produtividade Perdida</h2>
-                    <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-                        Tarefas se acumulam, prazos são perdidos e a comunicação da equipe é fragmentada. Você sente que está sempre "apagando incêndios" em vez de focar no que realmente importa para crescer?
-                    </p>
-                    <ul className="mt-6 space-y-2 text-neutral-600 dark:text-neutral-400">
-                        <li className="flex items-start"><span className="text-red-500 mr-2 mt-1">❌</span><span>Falta de clareza sobre as prioridades.</span></li>
-                        <li className="flex items-start"><span className="text-red-500 mr-2 mt-1">❌</span><span>Comunicação descentralizada em emails e chats.</span></li>
-                        <li className="flex items-start"><span className="text-red-500 mr-2 mt-1">❌</span><span>Dificuldade em acompanhar o progresso dos projetos.</span></li>
-                    </ul>
-                </div>
-                <div className="bg-primary/5 dark:bg-primary/10 p-8 rounded-lg border border-primary/20">
-                    <h2 className="text-3xl font-bold tracking-tight text-primary dark:text-primary-light">A Solução: Clareza e Controle Total</h2>
-                    <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-300">
-                        Nossa plataforma centraliza suas tarefas, projetos e comunicação, transformando o caos em um fluxo de trabalho organizado e eficiente. Tenha uma visão clara do que precisa ser feito e quem está fazendo.
-                    </p>
-                     <ul className="mt-6 space-y-2 text-neutral-600 dark:text-neutral-300">
-                        <li className="flex items-start"><span className="text-green-500 mr-2 mt-1">✅</span><span>Priorize tarefas com facilidade.</span></li>
-                        <li className="flex items-start"><span className="text-green-500 mr-2 mt-1">✅</span><span>Centralize a comunicação do seu time.</span></li>
-                        <li className="flex items-start"><span className="text-green-500 mr-2 mt-1">✅</span><span>Acompanhe o progresso em tempo real.</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-);
-
-// --- BLOCK 3: QUALIFICAÇÃO E BENEFÍCIOS ---
-
-const TargetAudienceSection: React.FC = () => (
-    <section id="target-audience" className="py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto">
-                <h2 className="text-3xl font-bold tracking-tight">Feito para Times que Buscam a Excelência</h2>
-                <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">Se você se encaixa em um destes perfis, esta solução foi desenhada para você.</p>
-            </div>
-            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div className="bg-neutral-100 dark:bg-neutral-800/50 p-6 rounded-lg shadow-md text-center">
-                    <UsersIcon className="h-10 w-10 mx-auto text-primary mb-4" />
-                    <h3 className="font-semibold text-lg">Gerentes de Projeto</h3>
-                    <p className="text-sm text-neutral-500 mt-1">Centralize projetos, delegue tarefas e monitore o progresso sem esforço.</p>
-                </div>
-                <div className="bg-neutral-100 dark:bg-neutral-800/50 p-6 rounded-lg shadow-md text-center">
-                    <ZapIcon className="h-10 w-10 mx-auto text-primary mb-4" />
-                    <h3 className="font-semibold text-lg">Startups e PMEs</h3>
-                    <p className="text-sm text-neutral-500 mt-1">Organize suas operações, alinhe sua equipe e acelere o crescimento.</p>
-                </div>
-                <div className="bg-neutral-100 dark:bg-neutral-800/50 p-6 rounded-lg shadow-md text-center">
-                    <TargetIcon className="h-10 w-10 mx-auto text-primary mb-4" />
-                    <h3 className="font-semibold text-lg">Agências de Marketing</h3>
-                    <p className="text-sm text-neutral-500 mt-1">Gerencie múltiplos clientes e campanhas em um só lugar, com total visibilidade.</p>
-                </div>
-                <div className="bg-neutral-100 dark:bg-neutral-800/50 p-6 rounded-lg shadow-md text-center">
-                     <HeartIcon className="h-10 w-10 mx-auto text-primary mb-4" />
-                    <h3 className="font-semibold text-lg">Freelancers e Autônomos</h3>
-                    <p className="text-sm text-neutral-500 mt-1">Organize seus projetos, controle seus prazos e impressione seus clientes.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-);
-
-const BenefitsSection: React.FC = () => {
-    const benefits = [
-        {
-            icon: <ZapIcon className="h-8 w-8 text-primary" />,
-            title: 'Performance Rápida',
-            description: 'Nossa infraestrutura otimizada garante velocidade e responsividade incomparáveis.'
-        },
-        {
-            icon: <ShieldIcon className="h-8 w-8 text-primary" />,
-            title: 'Segurança de Ponta',
-            description: 'Seus dados estão protegidos com as mais modernas tecnologias de segurança.'
-        },
-        {
-            icon: <CheckCircleIcon className="h-8 w-8 text-primary" />,
-            title: 'Fácil de Usar',
-            description: 'Interface intuitiva e amigável que não requer curva de aprendizado.'
-        }
-    ];
-    return (
-        <section id="benefits" className="py-20 bg-neutral-200 dark:bg-neutral-800">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid md:grid-cols-3 gap-12">
-                     {benefits.map(benefit => (
-                         <div key={benefit.title} className="flex items-start">
-                             <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full">{benefit.icon}</div>
-                             <div className="ml-4">
-                                 <h3 className="text-lg font-semibold">{benefit.title}</h3>
-                                 <p className="mt-1 text-neutral-600 dark:text-neutral-400">{benefit.description}</p>
-                             </div>
-                         </div>
-                     ))}
-                </div>
-            </div>
-        </section>
-    );
-};
-
-// --- BLOCK 4: PROVA SOCIAL E AUTORIDADE ---
-
-const TestimonialsSection: React.FC = () => {
-    const scrollContainer = useRef<HTMLDivElement>(null);
-    return (
-        <section id="testimonials" className="py-20 overflow-hidden">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight">O que nossos clientes dizem</h2>
-                    <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">Confiança construída com resultados.</p>
-                </div>
-                <div ref={scrollContainer} className="mt-12 flex space-x-8 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-                    {TESTIMONIALS.map((testimonial, index) => (
-                        <div key={index} className="snap-center flex-shrink-0 w-80 md:w-96 bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700">
-                            <p className="text-neutral-600 dark:text-neutral-300 italic">"{testimonial.quote}"</p>
-                            <div className="flex items-center mt-4">
-                                <img src={testimonial.avatarUrl} alt={testimonial.author} className="h-12 w-12 rounded-full object-cover" />
-                                <div className="ml-4">
-                                    <p className="font-semibold">{testimonial.author}</p>
-                                    <p className="text-sm text-neutral-500">{testimonial.role}</p>
-                                </div>
+                {/* Video Placeholder */}
+                <div className="w-full max-w-4xl mt-8">
+                    <div className="aspect-video rounded-xl border border-[#333] bg-[#111] shadow-2xl overflow-hidden relative group cursor-pointer">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-20 h-20 bg-[#FFD65D]/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Play className="w-8 h-8 text-black fill-black ml-1" />
                             </div>
                         </div>
-                    ))}
+                        {/* Imagem de Capa Simulada */}
+                        <div className="w-full h-full bg-gradient-to-br from-neutral-800 to-black opacity-50"></div>
+                        <p className="absolute bottom-6 left-6 text-white font-bold text-xl">Veja como a plataforma funciona</p>
+                    </div>
                 </div>
-            </div>
-        </section>
-    );
-};
-
-const AuthoritySection: React.FC = () => (
-    <section id="authority" className="py-16 bg-neutral-100 dark:bg-neutral-900">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 className="text-center text-lg font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-widest">Confiado por grandes empresas</h3>
-            <div className="mt-8 flex justify-center items-center gap-x-8 sm:gap-x-12 flex-wrap">
-                <div className="text-2xl font-bold text-neutral-400 dark:text-neutral-500 my-2">EMPRESA A</div>
-                <div className="text-2xl font-bold text-neutral-400 dark:text-neutral-500 my-2">LOGO B</div>
-                <div className="text-2xl font-bold text-neutral-400 dark:text-neutral-500 my-2">MARCA C</div>
-                <div className="text-2xl font-bold text-neutral-400 dark:text-neutral-500 my-2">CLIENTE D</div>
-                <div className="text-2xl font-bold text-neutral-400 dark:text-neutral-500 my-2">PARCEIRO E</div>
             </div>
         </div>
     </section>
 );
 
-const FounderStorySection: React.FC = () => (
-    <section id="founder-story" className="py-20">
+// --- BLOCO 2: PROBLEMA & SOLUÇÃO (INTERESSE) ---
+const ProblemSolutionSection: React.FC = () => (
+    <section className={`py-20 ${THEME.bgSecondary}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-3 gap-12 items-center max-w-5xl mx-auto">
-                <div className="md:col-span-1">
-                     <img src="https://picsum.photos/id/1005/400/400" alt="Fundador da Empresa" className="rounded-full shadow-lg aspect-square object-cover mx-auto" />
-                </div>
-                <div className="md:col-span-2">
-                    <h2 className="text-3xl font-bold tracking-tight">Uma Solução Nascida de uma Necessidade Real</h2>
-                    <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-300">
-                        "Eu era gerente de projetos e sentia na pele a frustração de usar múltiplas ferramentas que não se conversavam. Perdia horas tentando organizar o que era prioridade. Criei o ProdutoX para ser a plataforma que eu sempre quis ter: simples, integrada e focada em resultados."
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+                
+                {/* O Problema */}
+                <div className="space-y-6">
+                    <h2 className="text-3xl font-bold text-white">
+                        Você sente que está <span className="text-red-500">ficando para trás?</span>
+                    </h2>
+                    <p className={`${THEME.textMuted} text-lg leading-relaxed`}>
+                        O mercado evolui numa velocidade assustadora. Enquanto alguns usam IA para trabalhar 10x mais rápido, a maioria continua travada, perdendo tempo com tarefas manuais e comprando cursos desatualizados.
                     </p>
-                    <p className="mt-4 font-semibold text-neutral-800 dark:text-neutral-100">João da Silva, Fundador e CEO</p>
+                    <ul className="space-y-4 mt-4">
+                        {[
+                            "Excesso de informações desconexas",
+                            "Ferramentas complexas sem guia prático",
+                            "Medo de se tornar irrelevante no mercado"
+                        ].map((item, i) => (
+                            <li key={i} className="flex items-center text-neutral-300">
+                                <span className="text-red-500 mr-3">✕</span> {item}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-            </div>
-        </div>
-    </section>
-);
 
-// --- BLOCK 5: A OFERTA DETALHADA ---
-
-const HowItWorksSection: React.FC = () => {
-    const steps = [
-        { number: '01', title: 'Cadastro Rápido', description: 'Crie sua conta em menos de 60 segundos, sem complicações ou burocracia.' },
-        { number: '02', title: 'Configure sua Plataforma', description: 'Personalize a ferramenta de acordo com as necessidades específicas do seu negócio.' },
-        { number: '03', title: 'Comece a Crescer', description: 'Utilize nossos recursos para otimizar seu trabalho e ver resultados imediatos.' }
-    ];
-
-    return (
-        <section id="how-it-works" className="py-20 bg-neutral-200 dark:bg-neutral-800">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight">Como Funciona</h2>
-                    <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">Três passos simples para o sucesso.</p>
-                </div>
-                <div className="mt-12 grid md:grid-cols-3 gap-8">
-                    {steps.map(step => (
-                        <div key={step.number} className="text-center p-6 bg-neutral-100 dark:bg-neutral-900 rounded-lg shadow-md">
-                           <div className="text-5xl font-extrabold text-primary dark:text-primary-light mb-4">{step.number}</div>
-                           <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                           <p className="text-neutral-600 dark:text-neutral-400">{step.description}</p>
+                {/* A Solução */}
+                <div className={`p-8 rounded-2xl border border-[#FFD65D]/30 bg-[#151515] relative overflow-hidden`}>
+                    <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-[#FFD65D] opacity-10 blur-3xl rounded-full"></div>
+                    
+                    <h2 className={`text-3xl font-bold ${THEME.textPrimary}`}>
+                        A Academia Lendár[IA]
+                    </h2>
+                    <p className={`${THEME.textSecondary} mt-4 text-lg`}>
+                        Não é apenas um curso. É um ecossistema completo para você dominar a Inteligência Artificial e aplicá-la no seu negócio.
+                    </p>
+                    
+                    <div className="mt-8 grid grid-cols-1 gap-4">
+                        <div className="flex items-start bg-black/40 p-4 rounded-lg border border-[#333]">
+                            <Brain className="text-[#FFD65D] w-6 h-6 mt-1 mr-3 flex-shrink-0" />
+                            <div>
+                                <h4 className="text-white font-bold">Método Segundo Cérebro</h4>
+                                <p className="text-neutral-400 text-sm">Organize sua vida digital e nunca mais esqueça uma ideia.</p>
+                            </div>
                         </div>
-                    ))}
+                        <div className="flex items-start bg-black/40 p-4 rounded-lg border border-[#333]">
+                            <Users className="text-[#FFD65D] w-6 h-6 mt-1 mr-3 flex-shrink-0" />
+                            <div>
+                                <h4 className="text-white font-bold">Comunidade de Elite</h4>
+                                <p className="text-neutral-400 text-sm">Networking com profissionais que estão no campo de batalha.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+);
+
+// --- BLOCO 3: BENEFÍCIOS (DESEJO) ---
+const BenefitsSection: React.FC = () => (
+    <section className={`py-24 ${THEME.bg}`}>
+        <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-16">
+                O que você recebe no <span className={THEME.textPrimary}>Acesso Vitalício</span>
+            </h2>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+                {[
+                    { icon: <Target className="w-10 h-10" />, title: "25+ Cursos Completos", desc: "Do básico ao avançado em IA, Automação, Design e Copywriting." },
+                    { icon: <Shield className="w-10 h-10" />, title: "Certificados Oficiais", desc: "Validação profissional para cada trilha de conhecimento concluída." },
+                    { icon: <Zap className="w-10 h-10" />, title: "Atualizações Semanais", desc: "O mercado muda rápido. Nós mantemos você sempre à frente." },
+                    { icon: <Users className="w-10 h-10" />, title: "Networking Premium", desc: "Conecte-se com empresários e especialistas de 40 países." },
+                    { icon: <Lock className="w-10 h-10" />, title: "Materiais Exclusivos", desc: "Prompts prontos, templates de Notion e scripts de automação." },
+                    { icon: <Star className="w-10 h-10" />, title: "Suporte Prioritário", desc: "Equipe dedicada para tirar suas dúvidas técnicas e estratégicas." }
+                ].map((item, idx) => (
+                    <div key={idx} className="group p-8 bg-[#111] rounded-xl border border-[#222] hover:border-[#FFD65D] transition-all duration-300 hover:-translate-y-1">
+                        <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#FFD65D]/10 text-[#FFD65D] group-hover:bg-[#FFD65D] group-hover:text-black transition-colors">
+                            {item.icon}
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                        <p className="text-neutral-400">{item.desc}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+);
+
+// --- BLOCO 4: PROVA SOCIAL ---
+const StatsSection: React.FC = () => (
+    <section className="py-12 border-y border-[#222] bg-[#050505]">
+        <div className="container mx-auto px-4 flex flex-wrap justify-around items-center gap-8 text-center">
+            <div>
+                <p className={`text-4xl font-extrabold ${THEME.textPrimary}`}>10.000+</p>
+                <p className="text-neutral-400 text-sm uppercase tracking-widest mt-2">Alunos Ativos</p>
+            </div>
+            <div>
+                <p className={`text-4xl font-extrabold ${THEME.textPrimary}`}>40</p>
+                <p className="text-neutral-400 text-sm uppercase tracking-widest mt-2">Países</p>
+            </div>
+            <div>
+                <p className={`text-4xl font-extrabold ${THEME.textPrimary}`}>R$ 127 Mi</p>
+                <p className="text-neutral-400 text-sm uppercase tracking-widest mt-2">Gerados (Estimado)</p>
+            </div>
+        </div>
+    </section>
+);
+
+const TestimonialsSection: React.FC = () => (
+    <section className={`py-24 ${THEME.bgSecondary}`}>
+        <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center text-white mb-12">Quem aplica, <span className={THEME.textPrimary}>tem resultado</span></h2>
+            <div className="grid md:grid-cols-3 gap-8">
+                {TESTIMONIALS.map((t, i) => (
+                    <div key={i} className="bg-[#111] p-8 rounded-xl border border-[#222] relative">
+                        <div className="flex text-[#FFD65D] mb-4">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FFD65D" />)}
+                        </div>
+                        <p className="text-neutral-300 italic mb-6">"{t.quote}"</p>
+                        <div className="flex items-center gap-4">
+                            <img src={t.avatarUrl} alt={t.author} className="w-12 h-12 rounded-full border-2 border-[#FFD65D]" />
+                            <div>
+                                <p className="text-white font-bold text-sm">{t.author}</p>
+                                <p className="text-neutral-500 text-xs">{t.role}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+);
+
+// --- BLOCO 5: OFERTA (AÇÃO) ---
+const PricingSection: React.FC = () => (
+    <section id="pricing" className={`py-24 ${THEME.bg} relative`}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(255,214,93,0.1),_rgba(0,0,0,0)_60%)]"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl mx-auto bg-[#111] border border-[#FFD65D] rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(255,214,93,0.15)]">
+                <div className="bg-[#FFD65D] py-3 text-center">
+                    <p className="text-black font-extrabold text-sm uppercase tracking-widest">Oferta por Tempo Limitado</p>
+                </div>
+                
+                <div className="p-8 md:p-12 text-center">
+                    <h3 className="text-3xl font-bold text-white">Plano Vitalício Lendár[IA]</h3>
+                    <p className="text-neutral-400 mt-2">Pague uma vez, tenha acesso para sempre.</p>
+                    
+                    <div className="my-8">
+                        <p className="text-neutral-500 line-through text-lg">De R$ 2.997,00</p>
+                        <div className="flex justify-center items-end gap-2 text-[#FFD65D]">
+                            <span className="text-2xl font-bold mb-2">12x de</span>
+                            <span className="text-6xl font-extrabold">R$ 138,80</span>
+                        </div>
+                        <p className="text-white mt-2">ou R$ 1.397,00 à vista</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4 text-left max-w-lg mx-auto mb-8">
+                        {[
+                            "Acesso Vitalício a TUDO", 
+                            "25+ Cursos Completos", 
+                            "Comunidade Premium", 
+                            "Lives Semanais",
+                            "Certificados Oficiais",
+                            "Garantia de 7 Dias"
+                        ].map((feat, i) => (
+                            <div key={i} className="flex items-center text-neutral-300">
+                                <CheckCircle className="text-[#FFD65D] w-5 h-5 mr-2 flex-shrink-0" />
+                                <span>{feat}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <button className="w-full md:w-auto bg-[#FFD65D] hover:bg-[#E7C66C] text-black font-bold text-xl py-4 px-12 rounded-xl transition-transform hover:scale-105 shadow-lg">
+                        Quero Meu Acesso Agora
+                    </button>
+                    
+                    <div className="mt-6 flex justify-center items-center gap-2 text-sm text-neutral-500">
+                        <Shield className="w-4 h-4" />
+                        <span>Pagamento 100% Seguro • Acesso Imediato</span>
+                    </div>
                 </div>
             </div>
-        </section>
-    );
-};
-
-const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
-    <div className={`border rounded-lg p-6 flex flex-col ${product.isFeatured ? 'border-primary dark:border-primary-light ring-2 ring-primary dark:ring-primary-light' : 'border-neutral-300 dark:border-neutral-700'}`}>
-        {product.isFeatured && <div className="text-center mb-4"><span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">MAIS POPULAR</span></div>}
-        <h3 className="text-2xl font-bold text-center">{product.name}</h3>
-        <p className="text-4xl font-extrabold text-center my-4">{product.price}</p>
-        <ul className="space-y-2 mb-6 text-neutral-600 dark:text-neutral-400">
-            {product.features.map(feature => (
-                <li key={feature} className="flex items-center">
-                    <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                    <span>{feature}</span>
-                </li>
-            ))}
-        </ul>
-        <button className={`mt-auto w-full font-bold py-3 px-6 rounded-md transition-transform transform hover:scale-105 ${product.isFeatured ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600'}`}>
-            Comprar Agora
-        </button>
-    </div>
-);
-
-const InvestmentSection: React.FC = () => (
-    <section id="investment" className="py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-                <h2 className="text-3xl font-bold tracking-tight">Um Investimento Inteligente no Seu Crescimento</h2>
-                <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">Escolha o plano perfeito para você. Sem taxas escondidas.</p>
-            </div>
-            <div className="mt-12 grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                {PRODUCTS.map(product => <ProductCard key={product.id} product={product} />)}
-            </div>
         </div>
     </section>
 );
 
-
-// --- BLOCK 6: FECHAMENTO E REVERSÃO DE RISCO ---
-
-const GuaranteeSection: React.FC = () => (
-     <section id="guarantee" className="py-20 bg-neutral-100 dark:bg-neutral-900">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto bg-white dark:bg-neutral-800 border-2 border-dashed border-primary dark:border-primary-light rounded-lg p-8 text-center">
-                <ShieldIcon className="h-16 w-16 mx-auto text-primary mb-4" />
-                <h2 className="text-3xl font-bold tracking-tight">Sua Satisfação ou Seu Dinheiro de Volta</h2>
-                <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-300">
-                    Temos tanta confiança na nossa plataforma que oferecemos uma garantia incondicional de 7 dias. Se por qualquer motivo você não ficar 100% satisfeito, basta nos avisar e nós reembolsaremos seu investimento integralmente. Sem perguntas, sem burocracia. O risco é todo nosso.
-                </p>
-            </div>
-        </div>
-    </section>
-);
-
-const CTASection: React.FC = () => (
-    <section id="cta" className="py-20 bg-primary">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-extrabold text-white">Pronto para Transformar Seu Negócio?</h2>
-            <p className="mt-2 text-lg text-cyan-100 max-w-2xl mx-auto">Junte-se a milhares de empresas que já estão crescendo com a nossa plataforma. Comece seu teste gratuito hoje mesmo.</p>
-            <a href="#hero" className="mt-8 inline-block bg-white text-primary font-bold py-3 px-8 rounded-md transition-transform transform hover:scale-105 shadow-lg">
-                Começar Agora
-            </a>
-        </div>
-    </section>
-);
-
+// --- BLOCO 6: FAQ & FOOTER ---
 const FAQSection: React.FC = () => {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-    const toggleFAQ = (index: number) => {
-        setOpenIndex(openIndex === index ? null : index);
-    };
-
     return (
-        <section id="faq" className="py-20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold tracking-tight">Ainda tem Dúvidas?</h2>
-                     <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">Respostas para as perguntas mais comuns.</p>
-                </div>
+        <section className={`py-20 ${THEME.bgSecondary}`}>
+            <div className="container mx-auto px-4 max-w-3xl">
+                <h2 className="text-3xl font-bold text-center text-white mb-10">Perguntas Frequentes</h2>
                 <div className="space-y-4">
                     {FAQ_DATA.map((item, index) => (
-                        <div key={index} className="bg-neutral-100 dark:bg-neutral-800/50 rounded-lg shadow-sm">
+                        <div key={index} className="bg-[#111] border border-[#333] rounded-lg overflow-hidden">
                             <button
-                                onClick={() => toggleFAQ(index)}
-                                className="w-full flex justify-between items-center p-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
-                                aria-expanded={openIndex === index}
-                                aria-controls={`faq-answer-${index}`}
+                                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                                className="w-full flex justify-between items-center p-5 text-left text-white hover:bg-[#1A1A1A] transition-colors"
                             >
-                                <span className="text-md font-medium text-neutral-800 dark:text-neutral-100">{item.question}</span>
-                                <ChevronDownIcon
-                                    className={`h-5 w-5 text-neutral-500 transform transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`}
-                                />
+                                <span className="font-medium">{item.question}</span>
+                                <ChevronDown className={`w-5 h-5 text-[#FFD65D] transition-transform ${openIndex === index ? 'rotate-180' : ''}`} />
                             </button>
-                            <div
-                                id={`faq-answer-${index}`}
-                                className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-96' : 'max-h-0'}`}
-                            >
-                                <div className="px-5 pb-5">
-                                    <p className="text-neutral-600 dark:text-neutral-300">{item.answer}</p>
+                            {openIndex === index && (
+                                <div className="p-5 pt-0 text-neutral-400 border-t border-[#333] mt-2">
+                                    <p className="mt-4">{item.answer}</p>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -400,35 +381,48 @@ const FAQSection: React.FC = () => {
     );
 };
 
-// --- FINAL PAGE COMPONENT ---
+const Footer: React.FC = () => (
+    <footer className="py-10 bg-black border-t border-[#222] text-center">
+        <div className="container mx-auto px-4">
+            <p className="text-[#FFD65D] font-bold text-xl mb-4">LENDÁR[IA]</p>
+            <p className="text-neutral-600 text-sm">
+                &copy; {new Date().getFullYear()} Academia Lendária. Todos os direitos reservados.
+            </p>
+            <div className="flex justify-center gap-6 mt-6 text-neutral-500 text-sm">
+                <a href="#" className="hover:text-white">Termos de Uso</a>
+                <a href="#" className="hover:text-white">Políticas de Privacidade</a>
+            </div>
+        </div>
+    </footer>
+);
 
+// --- COMPONENTE PRINCIPAL ---
 const LandingPage: React.FC = () => {
   return (
-    <>
-      {/* Bloco 1: Captura e Proposta de Valor */}
+    <div className="font-sans antialiased selection:bg-[#FFD65D] selection:text-black">
       <HeroSection />
-      
-      {/* Bloco 2: Problematização e Solução */}
+      <StatsSection />
       <ProblemSolutionSection />
-      
-      {/* Bloco 3: Qualificação e Benefícios */}
-      <TargetAudienceSection />
       <BenefitsSection />
-      
-      {/* Bloco 4: Prova Social e Autoridade */}
       <TestimonialsSection />
-      <AuthoritySection />
-      <FounderStorySection />
-      
-      {/* Bloco 5: A Oferta Detalhada */}
-      <HowItWorksSection />
-      <InvestmentSection />
-      
-      {/* Bloco 6: Fechamento e Reversão de Risco */}
-      <GuaranteeSection />
-      <CTASection />
+      <PricingSection />
       <FAQSection />
-    </>
+      
+      {/* Seção CTA Final (Recuperação) */}
+      <section className="py-20 bg-[#FFD65D]">
+          <div className="container mx-auto px-4 text-center">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-black mb-6">
+                  Pronto para transformar seu futuro?
+              </h2>
+              <p className="text-black/80 text-lg mb-8 max-w-2xl mx-auto">
+                  Junte-se a milhares de profissionais que estão liderando a revolução da IA.
+              </p>
+              <InlineCheckoutForm />
+          </div>
+      </section>
+
+      <Footer />
+    </div>
   );
 };
 
