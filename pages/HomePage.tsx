@@ -1,176 +1,201 @@
-import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { TESTIMONIALS } from '../constants';
-import { CheckCircleIcon, ZapIcon, ShieldIcon } from '../components/icons';
+import React, { useState } from 'react';
+import { ShoppingCart, Menu, Search, User, ChevronRight, Star } from 'lucide-react';
 
-// --- SHARED COMPONENTS ---
+// Mock Data
+const products = [
+  { id: 1, name: "Smartphone X Pro", price: 2999.00, rating: 4.5, image: "/api/placeholder/300/300" },
+  { id: 2, name: "Notebook Ultra Slim", price: 4500.00, rating: 4.8, image: "/api/placeholder/300/300" },
+  { id: 3, name: "Fone Bluetooth Noise Cancelling", price: 899.00, rating: 4.2, image: "/api/placeholder/300/300" },
+  { id: 4, name: "Smartwatch Fitness", price: 650.00, rating: 4.6, image: "/api/placeholder/300/300" },
+];
 
-// InlineCheckoutForm Component
-interface InlineCheckoutFormProps {
-    productName: string;
-}
-const InlineCheckoutForm: React.FC<InlineCheckoutFormProps> = ({ productName }) => {
-    const [email, setEmail] = useState('');
-    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-    const [message, setMessage] = useState('');
+const categories = ["Eletrônicos", "Casa", "Moda", "Esportes", "Ofertas"];
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setStatus('loading');
-        setMessage('');
+export default function OriginalStore() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-        // Simulate API call for lead generation
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        if (email && email.includes('@')) {
-            setStatus('success');
-            setMessage(`Obrigado! Em breve entraremos em contato para finalizar sua compra do ${productName}.`);
-        } else {
-            setStatus('error');
-            setMessage('Por favor, insira um email válido.');
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="mt-6">
-            <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Seu melhor email"
-                    required
-                    className="flex-grow px-4 py-3 rounded-md bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 focus:ring-2 focus:ring-primary focus:outline-none transition-shadow"
-                    disabled={status === 'loading'}
-                />
-                <button
-                    type="submit"
-                    className="bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-6 rounded-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary disabled:bg-opacity-50 disabled:cursor-not-allowed"
-                    disabled={status === 'loading'}
-                >
-                    {status === 'loading' ? 'Enviando...' : 'Começar Agora'}
-                </button>
-            </div>
-            {message && (
-                <p className={`mt-3 text-sm ${status === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                    {message}
-                </p>
-            )}
-        </form>
-    );
-};
-
-// --- SECTIONS ---
-
-const HeroSection: React.FC = () => (
-    <section className="py-20 md:py-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-12 items-center">
-                <div className="text-center max-w-3xl">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
-                        Transforme Sua Produtividade com a <span className="text-primary dark:text-primary-light">Ferramenta Certa</span>
-                    </h1>
-                    <p className="mt-4 text-lg md:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
-                        Organize tarefas, colabore com sua equipe e alcance seus objetivos mais rápido. Tudo em um só lugar.
-                    </p>
-                    <div className="max-w-xl mx-auto">
-                        <InlineCheckoutForm productName="Produto Principal" />
-                    </div>
-                    <p className="mt-3 text-xs text-neutral-500">Teste por 7 dias grátis. Cancele quando quiser.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-);
-
-
-const BenefitsSection: React.FC = () => {
-    const benefits = [
-        {
-            icon: <ZapIcon className="h-8 w-8 text-primary" />,
-            title: 'Performance Rápida',
-            description: 'Nossa infraestrutura otimizada garante velocidade e responsividade incomparáveis.'
-        },
-        {
-            icon: <ShieldIcon className="h-8 w-8 text-primary" />,
-            title: 'Segurança de Ponta',
-            description: 'Seus dados estão protegidos com as mais modernas tecnologias de segurança.'
-        },
-        {
-            icon: <CheckCircleIcon className="h-8 w-8 text-primary" />,
-            title: 'Fácil de Usar',
-            description: 'Interface intuitiva e amigável que não requer curva de aprendizado.'
-        }
-    ];
-    return (
-        <section id="benefits" className="py-20 bg-neutral-200 dark:bg-neutral-800">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid md:grid-cols-3 gap-12">
-                     {benefits.map(benefit => (
-                         <div key={benefit.title} className="flex items-start">
-                             <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full">{benefit.icon}</div>
-                             <div className="ml-4">
-                                 <h3 className="text-lg font-semibold">{benefit.title}</h3>
-                                 <p className="mt-1 text-neutral-600 dark:text-neutral-400">{benefit.description}</p>
-                             </div>
-                         </div>
-                     ))}
-                </div>
-            </div>
-        </section>
-    );
-};
-
-const TestimonialsSection: React.FC = () => {
-    const scrollContainer = useRef<HTMLDivElement>(null);
-    return (
-        <section id="testimonials" className="py-20 overflow-hidden">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight">O que nossos clientes dizem</h2>
-                    <p className="mt-2 text-lg text-neutral-600 dark:text-neutral-400">Confiança construída com resultados.</p>
-                </div>
-                <div ref={scrollContainer} className="mt-12 flex space-x-8 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-                    {TESTIMONIALS.map((testimonial, index) => (
-                        <div key={index} className="snap-center flex-shrink-0 w-80 md:w-96 bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700">
-                            <p className="text-neutral-600 dark:text-neutral-300 italic">"{testimonial.quote}"</p>
-                            <div className="flex items-center mt-4">
-                                <img src={testimonial.avatarUrl} alt={testimonial.author} className="h-12 w-12 rounded-full object-cover" />
-                                <div className="ml-4">
-                                    <p className="font-semibold">{testimonial.author}</p>
-                                    <p className="text-sm text-neutral-500">{testimonial.role}</p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-};
-
-const CTASection: React.FC = () => (
-    <section id="cta" className="py-20 bg-primary">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-extrabold text-white">Quer Conhecer Todos os Detalhes?</h2>
-            <p className="mt-2 text-lg text-cyan-100 max-w-2xl mx-auto">Explore nossa página completa e descubra como podemos revolucionar seu fluxo de trabalho.</p>
-            <Link to="/landing" className="mt-8 inline-block bg-white text-primary font-bold py-3 px-8 rounded-md transition-transform transform hover:scale-105 shadow-lg">
-                Ver a Solução Completa
-            </Link>
-        </div>
-    </section>
-);
-
-
-const HomePage: React.FC = () => {
   return (
-    <>
-      <HeroSection />
-      <BenefitsSection />
-      <TestimonialsSection />
-      <CTASection />
-    </>
-  );
-};
+    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
+      {/* Header Padrão */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="text-2xl font-bold text-blue-600">TechStore</div>
 
-export default HomePage;
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex space-x-6">
+              {categories.map((cat) => (
+                <a key={cat} href="#" className="text-gray-600 hover:text-blue-600 transition">
+                  {cat}
+                </a>
+              ))}
+            </nav>
+
+            {/* Icons */}
+            <div className="flex items-center space-x-4">
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <Search className="w-5 h-5" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <User className="w-5 h-5" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full relative">
+                <ShoppingCart className="w-5 h-5" />
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+              </button>
+              <button 
+                className="md:hidden p-2 hover:bg-gray-100 rounded-full"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Nav */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white border-t px-4 py-2">
+            {categories.map((cat) => (
+              <a key={cat} href="#" className="block py-2 text-gray-600 hover:text-blue-600">
+                {cat}
+              </a>
+            ))}
+          </div>
+        )}
+      </header>
+
+      {/* Hero Section Simples */}
+      <section className="bg-gray-100 py-16 md:py-24">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+          <div className="md:w-1/2 mb-8 md:mb-0">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Tecnologia para o seu dia a dia
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Encontre os melhores gadgets e acessórios com preços justos e entrega rápida para todo o Brasil.
+            </p>
+            <button className="bg-blue-600 text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-700 transition">
+              Comprar Agora
+            </button>
+          </div>
+          <div className="md:w-1/2 flex justify-center">
+            <div className="w-full max-w-md h-64 bg-gray-300 rounded-lg flex items-center justify-center text-gray-500">
+              [Imagem Hero]
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Bar */}
+      <section className="bg-white py-8 border-b">
+        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div>
+            <h3 className="font-bold text-lg">Frete Grátis</h3>
+            <p className="text-sm text-gray-500">Em compras acima de R$ 200</p>
+          </div>
+          <div>
+            <h3 className="font-bold text-lg">Pagamento Seguro</h3>
+            <p className="text-sm text-gray-500">Cartão de crédito ou PIX</p>
+          </div>
+          <div>
+            <h3 className="font-bold text-lg">Garantia de 30 dias</h3>
+            <p className="text-sm text-gray-500">Reembolso garantido</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-16 container mx-auto px-4">
+        <div className="flex justify-between items-end mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">Destaques da Semana</h2>
+          <a href="#" className="text-blue-600 flex items-center hover:underline">
+            Ver tudo <ChevronRight className="w-4 h-4 ml-1" />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <div key={product.id} className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition">
+              <div className="h-48 bg-gray-200 w-full flex items-center justify-center text-gray-400">
+                [Imagem Produto]
+              </div>
+              <div className="p-4">
+                <div className="flex items-center mb-2">
+                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <span className="text-xs text-gray-500 ml-1">{product.rating}</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2 truncate">{product.name}</h3>
+                <p className="text-xl font-bold text-gray-900">
+                  R$ {product.price.toFixed(2)}
+                </p>
+                <button className="w-full mt-4 bg-gray-900 text-white py-2 rounded text-sm hover:bg-gray-800 transition">
+                  Adicionar ao Carrinho
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="bg-blue-600 py-16 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">Receba nossas ofertas</h2>
+          <p className="mb-8 text-blue-100">Cadastre-se para receber descontos exclusivos no seu e-mail.</p>
+          <div className="max-w-md mx-auto flex gap-2">
+            <input 
+              type="email" 
+              placeholder="Seu melhor e-mail" 
+              className="flex-1 px-4 py-3 rounded text-gray-900 focus:outline-none"
+            />
+            <button className="bg-gray-900 text-white px-6 py-3 rounded font-semibold hover:bg-gray-800 transition">
+              Assinar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h4 className="text-white font-bold text-lg mb-4">TechStore</h4>
+              <p className="text-sm">Sua loja favorita de tecnologia com os melhores preços do mercado.</p>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Links Úteis</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Sobre Nós</a></li>
+                <li><a href="#" className="hover:text-white">Contato</a></li>
+                <li><a href="#" className="hover:text-white">Política de Privacidade</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Ajuda</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Meus Pedidos</a></li>
+                <li><a href="#" className="hover:text-white">Trocas e Devoluções</a></li>
+                <li><a href="#" className="hover:text-white">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Redes Sociais</h4>
+              <div className="flex space-x-4">
+                {/* Social Placeholders */}
+                <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
+                <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
+                <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-sm">
+            &copy; 2023 TechStore. Todos os direitos reservados.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
